@@ -12,6 +12,7 @@ from sklearn.decomposition import PCA
 from scipy.spatial.distance import cdist
 
 import streamlit as st
+import os
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -204,8 +205,11 @@ def ranked_borough(dataframe, clusters, user_preference, scaler, pca, kmeans):
 
 # %%
 # Main execution
-filepath = "C:/Users/Jamie/python_ws/Area_Recommender/data/London_borough.csv"
-df = load_and_clean_data(filepath)
+
+folder_dir = os.path.abspath(os.getcwd())
+file_path = os.path.join(folder_dir, "London-Area-Recommender-System\\data\\London_borough.csv")
+
+df = load_and_clean_data(file_path)
 user_preference = generate_user_preference(df)
 imputed_df = impute_missing_data(df)
 scaler, pca, pca_df = standardize_and_reduce_data(imputed_df)
