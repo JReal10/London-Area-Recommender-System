@@ -11,13 +11,16 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from scipy.spatial.distance import cdist
 
+#geopandas
+import geopandas as gpd
+import geodatasets as gds
+
 import streamlit as st
 import os
 
 import warnings
 warnings.filterwarnings('ignore')
 
-import unittest
 
 # %%
 def load_and_clean_data(filepath):
@@ -207,7 +210,7 @@ def ranked_borough(dataframe, clusters, user_preference, scaler, pca, kmeans):
 # Main execution
 
 folder_dir = os.path.abspath(os.getcwd())
-file_path = os.path.join(folder_dir, "London-Area-Recommender-System\\data\\London_borough.csv")
+file_path = os.path.join(folder_dir, "London-Area-Recommender-System\\data\\raw_data\\London_borough.csv")
 
 df = load_and_clean_data(file_path)
 user_preference = generate_user_preference(df)
