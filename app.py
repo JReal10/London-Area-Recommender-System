@@ -1,157 +1,146 @@
 # %%
-import numpy as np
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-
-from sklearn.neighbors import NearestNeighbors
-from sklearn.impute import KNNImputer
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-from scipy.spatial.distance import cdist
-
-#geopandas
-import geopandas as gpd
-import geodatasets as gds
-from shapely import wkt
-
 import streamlit as st
+import pandas as pd
+import geopandas as gpd
+import matplotlib.pyplot as plt
+import numpy as np
+from shapely import wkt
 import os
 
-import warnings
-warnings.filterwarnings('ignore')
+# Set page config
+st.set_page_config(page_title="London Borough Recommender", page_icon="🏙️", layout="wide")
 
-# %%
-def generate_user_preference(dataframe):
-    
-    """
-    Generate random user preferences based on the range of numeric columns in the DataFrame for a single user.
-    
-    Args:
-    dataframe (pd.DataFrame): The input DataFrame.
+# Load data
+@st.cache_data
+def load_data():
+    folder_dir = os.path.abspath(os.getcwd())
+    file_path = os.path.join(folder_dir, "London-Area-Recommender-System", "data", "transformed_data", "london_borough.csv")
+    df = pd.read_csv(file_path)
+    df = gpd.GeoDataFrame(df)
+    df['geometry'] = df['geometry'].apply(wkt.loads)
+    df = df.set_geometry('geometry')
+    return df
 
-    Returns:
-    np.ndarray: An array of random user preferences.
-    """
-    
-    numeric_columns = dataframe.select_dtypes(include=[np.number]).columns.tolist()
-    min_values = dataframe[numeric_columns].min()
-    max_values = dataframe[numeric_columns].max()
-    user_preference = np.random.rand(1, len(numeric_columns)) * (max_values - min_values).values + min_values.values
-    
-    print(f"User Preferences: {np.round(user_preference, 2)}")
-    
-    return user_preference
+df = load_data()
 
-
-# %%
-def visualize_data(data):
-    """
-    Visualizes the given data by plotting the 'Cluster' column on a map.
-
-    Parameters:
-    data (GeoDataFrame): A GeoDataFrame containing the data to be visualized. 
-                         It should have a 'Cluster' column for plotting.
-
-    Returns:
-    None: This function does not return any value. It displays a plot.
-    """
-    # Create a map that plots the column 'Cluster'
-    fig, ax = plt.subplots(1, 1, figsize=(10, 6))
-    data.plot(column='Cluster', cmap='viridis', linewidth=0.8, ax=ax, edgecolor='0.8', legend=True)
-    plt.title('London Borough Clusters')
-    plt.show()
-
-
-
-# %%
-def ranked_borough(dataframe, clusters, user_preference, scaler, pca, kmeans):
-    """
-    Recommend boroughs based on a single user's preferences and clustered data.
-    
-    Args:
-    dataframe (pd.DataFrame): The input DataFrame.
-    clusters (np.ndarray): Cluster labels for the data.
-    user_preference (np.ndarray): Single user preferences to match with clusters.
-    scaler (StandardScaler): The scaler used for data standardization.
-    pca (PCA): The PCA model used for dimensionality reduction.
-    kmeans (KMeans): The KMeans model used for clustering.
-
-    Returns:
-    list: Recommended boroughs for the nearest user cluster.
-    """
-    
-    user_preference_scaled = scaler.transform(user_preference)
-    user_pca_preference = pca.transform(user_preference_scaled)
-    centroids = kmeans.cluster_centers_
-    nn = NearestNeighbors(n_neighbors=1)
-    nn.fit(centroids)
-    distances, nearest_cluster_indices = nn.kneighbors(user_pca_preference)
-    nearest_cluster = nearest_cluster_indices.flatten()[0]
-    print("Nearest Cluster for User Preference:", nearest_cluster)
-    
-    dataframe['Cluster'] = clusters
-    nearest_cluster_boroughs = dataframe[dataframe['Cluster'] == nearest_cluster]
-    
-    # Calculate distances between user preferences and boroughs in the nearest cluster
-    cluster_data = nearest_cluster_boroughs.drop(['Area', 'Cluster'], axis=1)
-    cluster_data_scaled = scaler.transform(cluster_data)
-    cluster_data_pca = pca.transform(cluster_data_scaled)
-    distances = cdist(user_pca_preference, cluster_data_pca, 'euclidean').flatten()
-    
-    nearest_cluster_boroughs['Distance'] = distances
-    ranked_boroughs = nearest_cluster_boroughs.sort_values(by='Distance')
-    ranked_boroughs = ranked_boroughs[['Area', 'Distance']]
-    
-    print("Ranked Boroughs based on User Preference:")
-    print(ranked_boroughs)
-    return ranked_boroughs
-
-# %%
-# Main execution
-
-folder_dir = os.path.abspath(os.getcwd())
-file_path = os.path.join(folder_dir, "London-Area-Recommender-System\\data\\transformed_data\\london_borough.csv")
-
-df = pd.read_csv(file_path)
-df = gpd.GeoDataFrame(df)
-df['geometry'] = df['geometry'].apply(wkt.loads)
-
-# Assuming your geometry column is named 'geometry'
-df = df.set_geometry('geometry')
-#ranked_boroughs = ranked_borough(imputed_df, clusters, user_preference, scaler, pca, kmeans)
-
-
-# Streamlit UI
-st.title("London Borough Recommender")
-
-st.sidebar.header("User Preferences")
-
-importance_levels = {
-    "Not important": 1,
-    "Slightly important": 2,
-    "Moderately important": 3,
-    "Important": 4,
-    "Very important": 5
+# Define cluster characteristics weights
+cluster_weights = {
+    'Affordability': [2, 1, 0, 3, 0],
+    'Safety and low crime': [1, 3, 2, 0, 3],
+    'Public transport and accessibility': [0, 3, 1, 0, 3],
+    'Access to green spaces': [1, 2, 3, 0, 2]
 }
 
-user_preferences = {}
-for col in df.columns:
-    if col != 'Area':
-        user_preferences[col] = st.sidebar.radio(
-            f"How important is {col} to you?",
-            options=list(importance_levels.keys())
-        )
+education_weights = {
+    'Very important': [2, 2, 1, 0, 3],
+    'Moderately important': [1, 1, 1, 1, 1],
+    'Not important': [0, 0, 0, 1, 0]
+}
 
-if st.sidebar.button("Submit"):
-    user_preference = np.array([[importance_levels[user_preferences[col]] for col in user_preferences]])
+transport_weights = {
+    'High': [0, 2, 1, 0, 3],
+    'Moderate': [1, 1, 1, 1, 1],
+    'Low, prefer less busy areas': [2, 1, 1, 2, 0]
+}
+
+environment_weights = {
+    'Very concerned': [1, 1, 3, 0, 2],
+    'Moderately concerned': [1, 1, 2, 1, 1],
+    'Not a major concern': [0, 0, 0, 2, 0]
+}
+
+property_price_weights = {
+    'High-end areas, cost is not a problem': [1, 0, 0, 0, 3],
+    'Mid-range pricing with good balance': [1, 2, 1, 1, 1],
+    'More affordable with potential for growth': [0, 0, 0, 3, 0]
+}
+
+# Function to calculate the scores and recommend the best cluster
+def recommend_cluster(priority, education, transport, environment, property_price):
+    cluster_scores = [0, 0, 0, 0, 0]
     
-    # Assuming you have already performed clustering and have the 'Cluster' column in df
-    # Create a map that plots the column 'Cluster'
-    fig, ax = plt.subplots(1, 1, figsize=(10, 6))
-    df.plot(column='Cluster', cmap='viridis', linewidth=0.8, ax=ax, legend=True)
-    plt.title('London Borough Clusters')
-    st.pyplot(fig)
-else:
-    st.write("Please enter your preferences and click Submit.")
+    for i in range(len(cluster_scores)):
+        cluster_scores[i] += cluster_weights[priority][i]
+        cluster_scores[i] += education_weights[education][i]
+        cluster_scores[i] += transport_weights[transport][i]
+        cluster_scores[i] += environment_weights[environment][i]
+        cluster_scores[i] += property_price_weights[property_price][i]
+    
+    recommended_cluster = np.argmax(cluster_scores)
+    return recommended_cluster, cluster_scores
+
+# Streamlit UI
+st.title("🏙️ London Borough Recommender")
+
+st.markdown("""
+This app helps you find the best London borough based on your preferences. 
+Answer a few questions about your priorities, and we'll recommend the most suitable areas for you!
+""")
+
+# Create two columns for layout
+col1, col2 = st.columns([1, 2])
+
+with col1:
+    st.subheader("Your Preferences")
+    
+    priority = st.selectbox(
+        "What is your top priority?",
+        ("Affordability", "Safety and low crime", "Public transport and accessibility", "Access to green spaces")
+    )
+    
+    education = st.selectbox(
+        "Importance of access to good schools?",
+        ("Very important", "Moderately important", "Not important")
+    )
+    
+    transport = st.selectbox(
+        "Ideal level of public transport?",
+        ("High", "Moderate", "Low, prefer less busy areas")
+    )
+    
+    environment = st.selectbox(
+        "Concern about environmental factors?",
+        ("Very concerned", "Moderately concerned", "Not a major concern")
+    )
+    
+    property_price = st.selectbox(
+        "Property pricing preference?",
+        ("High-end areas, cost is not a problem", "Mid-range pricing with good balance", "More affordable with potential for growth")
+    )
+    
+    if st.button('Get Recommendation', type='primary'):
+        recommended_cluster, cluster_scores = recommend_cluster(priority, education, transport, environment, property_price)
+        
+        df['highlight'] = np.where(df['Cluster'] == recommended_cluster, 'Recommended', 'Other')
+        
+        stat_df = df[df['Cluster'] == recommended_cluster].drop(columns=['geometry'])
+        recommended_boroughs = stat_df['Area'].tolist()
+        
+        with col2:
+            st.subheader("Recommendation Results")
+            st.success(f"Based on your preferences, we recommend Cluster {recommended_cluster}.")
+            st.write(f"**Recommended Boroughs:** {', '.join(recommended_boroughs)}")
+            
+            # Create a map
+            fig, ax = plt.subplots(1, 1, figsize=(10, 8))
+            cmap = {'Recommended': '#1E88E5', 'Other': '#E0E0E0'}
+            df.plot(column='highlight', color=df['highlight'].map(cmap), linewidth=0.8, edgecolor='0.8', ax=ax, legend=True)
+            ax.axis('off')
+            plt.title(f'London Boroughs - Highlighting Cluster {recommended_cluster}')
+            st.pyplot(fig)
+            
+            # Display scores
+            st.subheader("Category Scores")
+            scores = {
+                "Education": education_weights[education][recommended_cluster],
+                "Transport": transport_weights[transport][recommended_cluster],
+                "Environment": environment_weights[environment][recommended_cluster],
+                "Property Price": property_price_weights[property_price][recommended_cluster]
+            }
+            
+            for category, score in scores.items():
+                st.metric(label=category, value=score)
+
+# Footer
+st.markdown("---")
+st.markdown("Built with ❤️ using Streamlit")
