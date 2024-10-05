@@ -1,0 +1,10 @@
+streamlit==1.22.0
+pandas==1.5.3
+geopandas==0.12.2
+matplotlib==3.7.1
+numpy==1.24.3
+shapely==2.0.1
+fiona==1.9.1
+rtree==1.0.1
+pyproj==3.4.0  # Downgrade to avoid the PROJ installation issue
+setuptools>=65.5.0  # Ensure setuptools is updated to avoid distutils errors
