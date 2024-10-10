@@ -11,15 +11,30 @@ import os
 st.set_page_config(page_title="London Borough Recommender", page_icon="🏙️", layout="wide")
 
 # Load data
+import os
+import geopandas as gpd
+import pandas as pd
+from shapely import wkt
+
 @st.cache_data
 def load_data():
-    folder_dir = os.path.abspath(os.getcwd())
-    file_path = os.path.join(folder_dir, "London-Area-Recommender-System", "data", "transformed_data", "london_borough.csv")
+    # Use relative path
+    file_path = os.path.join("data", "transformed_data", "london_borough.csv")
+
+    # Check if the file exists before reading it
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"File not found at {file_path}")
+
+    # Load the dataframe
     df = pd.read_csv(file_path)
+    
+    # Convert the dataframe to GeoDataFrame
     df = gpd.GeoDataFrame(df)
     df['geometry'] = df['geometry'].apply(wkt.loads)
     df = df.set_geometry('geometry')
+    
     return df
+
 
 df = load_data()
 
