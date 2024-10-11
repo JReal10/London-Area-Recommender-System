@@ -1,5 +1,6 @@
 <p align="center">
   <img src="thumbnail/LondonImage.jpg" alt="Header Image" width="100%" height="450px">
+  <sub>Image credit: Kerryhyndman (<a href="https://kerryhyndman.tumblr.com/post/132939651276/new-london-map-illustration-its-now-available-to">source_url</a>)</sub>
 </p>
 
 # London Borough Recommender
