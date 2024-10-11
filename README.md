@@ -8,6 +8,8 @@
 
 > A Streamlit-based application that recommends London areas based on user preferences and requirements.
 
+**Live App:** [London Borough Recommender](https://londonborough.streamlit.app/)
+
 ## Project Overview
 
 The London Area Recommender System is designed to help users find suitable areas to live in London based on their personal preferences and requirements. By analyzing various factors such as housing prices, crime rates, transportation accessibility, and amenities, this application provides tailored recommendations for potential residents of London.
