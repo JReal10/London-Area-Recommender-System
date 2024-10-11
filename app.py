@@ -141,7 +141,6 @@ with col1:
             cmap = {'Recommended': '#1E88E5', 'Other': '#E0E0E0'}
             df.plot(column='highlight', color=df['highlight'].map(cmap), linewidth=0.8, edgecolor='0.8', ax=ax, legend=True)
             ax.axis('off')
-            plt.title(f'London Boroughs - Highlighting Cluster {recommended_cluster}')
             st.pyplot(fig)
             
             # Display scores
