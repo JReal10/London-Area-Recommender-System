@@ -1,59 +1,55 @@
-# Reddit Stock Sentiment Analyzer
+# London Area Recommender System
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/JReal10/London-Area-Recommender-System?include_prereleases)
+![GitHub last commit](https://img.shields.io/github/last-commit/JReal10/London-Area-Recommender-System)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/JReal10/London-Area-Recommender-System)
+![GitHub](https://img.shields.io/github/license/JReal10/London-Area-Recommender-System)
+![contributors](https://img.shields.io/github/contributors/JReal10/London-Area-Recommender-System)
+![codesize](https://img.shields.io/github/languages/code-size/JReal10/London-Area-Recommender-System)
 
-![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/JReal10/Reddit-Stock-Sentiment-Analyzer?include_prereleases)
-![GitHub last commit](https://img.shields.io/github/last-commit/JReal10/Reddit-Stock-Sentiment-Analyzer)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/JReal10/Reddit-Stock-Sentiment-Analyzer)
-![GitHub](https://img.shields.io/github/license/JReal10/Reddit-Stock-Sentiment-Analyzer)
-![contributors](https://img.shields.io/github/contributors/JReal10/Reddit-Stock-Sentiment-Analyzer)
-![codesize](https://img.shields.io/github/languages/code-size/JReal10/Reddit-Stock-Sentiment-Analyzer)
+> A Streamlit-based application that recommends London areas based on user preferences and requirements.
 
-> A Streamlit-based application that analyzes the sentiment of Reddit comments related to a given stock.
+**Live App:** [London Borough Recommender](https://londonborough.streamlit.app/)
 
 ## Project Overview
 
-The Reddit Stock Sentiment Analyzer project aims to provide a comprehensive analysis of the sentiment surrounding a specific stock based on comments from the Reddit community. By leveraging natural language processing techniques, this application extracts and visualizes the sentiment of Reddit discussions, allowing users to gain insights into the overall market sentiment for a particular stock.
+The London Area Recommender System is designed to help users find suitable areas to live in London based on their personal preferences and requirements. By analyzing various factors such as housing prices, crime rates, transportation accessibility, and amenities, this application provides tailored recommendations for potential residents of London.
 
 ## Installation and Setup
 
 To set up the project on your local machine, follow the instructions below:
 
 ### Codes and Resources Used
-
 - **Editor Used:** Visual Studio Code
-- **Python Version:** 3.8
+- **Python Version:** 3.8 (or later)
 
 ### Python Packages Used
 
 #### General Purpose
-
 - `streamlit`
 - `pandas`
 - `numpy`
-- `re`
 
 #### Data Acquisition
 - `requests`
 
 #### Data Processing
-- `transformers`
-- `torch`
+- `scikit-learn`
 
 #### Data Visualization
 - `plotly.express`
+- `folium`
 
 ## Data
 
 ### Source Data
-
-- **Reddit API:** Fetches comments from the "stocks" and "wallstreetbets" subreddits.
+- **London Datastore:** Provides various datasets about London boroughs, including housing prices, crime statistics, and transportation data.
+- **OpenStreetMap:** Used for geospatial data and mapping features.
 
 ### Data Acquisition
-
-The Reddit data is fetched using the `requests` library and the Reddit API. The data acquisition process is handled in the `fetch_reddit_data()` function.
+The London data is fetched using the `requests` library and various APIs. The data acquisition process is handled in separate scripts within the `data_acquisition` directory.
 
 ### Data Preprocessing
-
-The Reddit comments are preprocessed, including text cleaning and sentiment analysis, in the `process_reddit_data()` function. The sentiment analysis is performed using a pre-trained transformer model from the `transformers` library.
+The acquired data is preprocessed, including cleaning, normalization, and feature engineering, in the `data_processing` directory. This ensures that the data is ready for analysis and recommendation generation.
 
 ## Code Structure
 
@@ -61,12 +57,47 @@ The project is organized as follows:
 
 ```bash
 ├── app.py
+├── data_acquisition
+│   ├── fetch_housing_data.py
+│   ├── fetch_crime_data.py
+│   └── fetch_transport_data.py
+├── data_processing
+│   ├── preprocess_data.py
+│   └── feature_engineering.py
 ├── models
-│   └── transformer_model.py
-├── scripts
-│   ├── fetch_reddit_data.py
-│   ├── process_reddit_data.py
-│   └── database_manager.py
+│   └── recommender_model.py
+├── utils
+│   ├── data_loader.py
+│   └── visualization.py
+├── tests
+│   ├── test_data_acquisition.py
+│   ├── test_data_processing.py
+│   └── test_recommender.py
+├── requirements.txt
 ├── LICENSE
 ├── README.md
 └── .gitignore
+```
+
+## Features
+
+- User-friendly interface for inputting preferences and requirements
+- Interactive map visualization of recommended areas
+- Detailed information about each recommended area, including housing prices, crime rates, and nearby amenities
+- Customizable weighting of different factors for personalized recommendations
+
+## How to Use
+
+1. Clone the repository
+2. Install the required packages: `pip install -r requirements.txt`
+3. Run the Streamlit app: `streamlit run app.py`
+4. Input your preferences and requirements in the sidebar
+5. Explore the recommended areas on the interactive map and in the detailed results section
+
+## Contributing
+
+Contributions to improve the London Area Recommender System are welcome. Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
