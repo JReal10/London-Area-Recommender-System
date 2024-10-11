@@ -7,9 +7,10 @@
 ![codesize](https://img.shields.io/github/languages/code-size/JReal10/London-Area-Recommender-System)
 
 > A Streamlit-based application that recommends London areas based on user preferences and requirements.
-[Download Video](thumbnail/video.mp4)
-
+![Alt Text](path/to/image.png)
 **Live App:** [London Borough Recommender](https://londonborough.streamlit.app/)
+
+**Documentation:** [Process of building it](https://londonborough.streamlit.app/)
 
 ## Project Overview
 
