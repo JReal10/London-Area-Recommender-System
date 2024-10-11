@@ -10,100 +10,147 @@
 ![contributors](https://img.shields.io/github/contributors/JReal10/London-Area-Recommender-System)
 ![codesize](https://img.shields.io/github/languages/code-size/JReal10/London-Area-Recommender-System)
 
-> A Streamlit-based application that recommends London areas based on user preferences and requirements.
+> A Streamlit-based application that recommends London boroughs based on user preferences and socio-economic data.
 
 **Live App:** [London Borough Recommender](https://londonborough.streamlit.app/)
 
-**Documentation:** [Process of building it](https://londonborough.streamlit.app/)
+**Documentation:** [Process of building it](https://github.com/JReal10/London-Area-Recommender-System/blob/main/area_recommender.ipynb)
 
 ## Project Overview
 
-The London Area Recommender System is designed to help users find suitable areas to live in London based on their personal preferences and requirements. By analyzing various factors such as housing prices, crime rates, transportation accessibility, and amenities, this application provides tailored recommendations for potential residents of London.
+The London Borough Recommender is a data-driven system that helps users discover suitable areas to live in London based on their personal preferences. It analyzes socio-economic factors across boroughs, such as housing prices, crime rates, unemployment rates, education, and environmental factors, to provide tailored recommendations.
+
+This project combines machine learning techniques like clustering and dimensionality reduction to classify boroughs based on similar characteristics and suggests boroughs that align with user preferences.
 
 ## Installation and Setup
 
+### Pre-requisites
+
 To set up the project on your local machine, follow the instructions below:
 
-### Codes and Resources Used
-- **Editor Used:** Visual Studio Code
-- **Python Version:** 3.8 (or later)
+- **Editor:** Visual Studio Code (or any preferred IDE)
+- **Python Version:** 3.8 or later
 
-### Python Packages Used
+### Required Python Libraries
+The key Python packages used in the project are:
 
-#### General Purpose
-- `streamlit`
-- `pandas`
-- `numpy`
+- **General Purpose:**
+  - `streamlit`
+  - `pandas`
+  - `numpy`
 
-#### Data Acquisition
-- `requests`
+- **Geospatial Processing:**
+  - `geopandas`
+  - `shapely`
 
-#### Data Processing
-- `scikit-learn`
+- **Data Processing & Machine Learning:**
+  - `scikit-learn` (for clustering and dimensionality reduction)
+  - `matplotlib` (for data visualization)
+  - `seaborn`
+  - `scipy`
 
-#### Data Visualization
-- `plotly.express`
-- `folium`
+### Setup Instructions
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/JReal10/London-Area-Recommender-System.git
+   ```
+
+2. Navigate to the project directory:
+   ```bash
+   cd London-Area-Recommender-System
+   ```
+
+3. Install the required packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Run the Streamlit app:
+   ```bash
+   streamlit run app.py
+   ```
 
 ## Data
 
-### Source Data
-- **London Datastore:** Provides various datasets about London boroughs, including housing prices, crime statistics, and transportation data.
-- **OpenStreetMap:** Used for geospatial data and mapping features.
+### Data Sources
+The project integrates socio-economic data from multiple sources:
 
-### Data Acquisition
-The London data is fetched using the `requests` library and various APIs. The data acquisition process is handled in separate scripts within the `data_acquisition` directory.
+- **London Datastore:** Provides borough-level data on housing, crime, education, unemployment, and environmental factors.
+- **Trust for London:** Provides borough-level data on poverty rates, unemployment, and education achievements. 
+  - **Poverty rate 2022/2023:** Percentage of the population living under the poverty line. [Source](https://trustforlondon.org.uk/)
+  - **Unemployment rate:** Percentage of unemployed individuals in the area. [Source](https://trustforlondon.org.uk/)
+  - **Education Achievement:** Percentage of pupils who achieved grade 9-4 in secondary education. [Source](https://trustforlondon.org.uk/)
+- **Statistical GIS Boundaries (OpenStreetMap):** Provides geospatial data for mapping the London boroughs.
+
 
 ### Data Preprocessing
-The acquired data is preprocessed, including cleaning, normalization, and feature engineering, in the `data_processing` directory. This ensures that the data is ready for analysis and recommendation generation.
+The raw data is processed through the following steps:
+
+- **Loading and Cleaning:** Socio-economic and geographical data are cleaned and merged to ensure consistency in borough names and structures.
+- **Normalization:** Data is standardized to ensure all features (e.g., crime rates, property prices) are on the same scale.
+- **Dimensionality Reduction:** Principal Component Analysis (PCA) is used to reduce the data's complexity while retaining variance for clustering.
+- **Clustering:** K-Means clustering is applied to group similar boroughs based on their characteristics.
+
+## Visualization
+The project provides multiple data visualizations, including:
+
+- **Pairplots and heatmaps** for correlation analysis.
+- **Scatter plots** of PCA components to visualize borough clusters.
+- **Choropleth maps** for geospatial visualization of the clustered boroughs.
 
 ## Code Structure
-
-The project is organized as follows:
+The project is organized into several directories for better modularity:
 
 ```bash
-├── app.py
-├── data_acquisition
-│   ├── fetch_housing_data.py
-│   ├── fetch_crime_data.py
-│   └── fetch_transport_data.py
-├── data_processing
-│   ├── preprocess_data.py
-│   └── feature_engineering.py
-├── models
-│   └── recommender_model.py
-├── utils
-│   ├── data_loader.py
-│   └── visualization.py
-├── tests
-│   ├── test_data_acquisition.py
-│   ├── test_data_processing.py
-│   └── test_recommender.py
-├── requirements.txt
-├── LICENSE
-├── README.md
-└── .gitignore
+Area_Recommender
+├─ .vscode
+│  └─ settings.json                    # Settings for Visual Studio Code
+├─ London-Area-Recommender-System
+│  ├─ .devcontainer
+│  │  └─ devcontainer.json              # Dev container configuration for VS Code
+│  ├─ app.py                            # Main Streamlit application
+│  ├─ area_recommender.ipynb            # Jupyter notebook for development and documentation
+│  ├─ data                              # Data directory
+│  │  ├─ london_borough_metadata.csv    # Metadata for London boroughs
+│  │  ├─ raw_data                       # Raw data sources
+│  │  │  └─ London-wards-2018           # Shapefiles and raw geographic data
+│  │  └─ transformed_data
+│  │     └─ london_borough.csv          # Transformed data ready for analysis
+│  ├─ LICENSE
+│  ├─ README.md
+│  ├─ requirements.txt                  # Dependencies
+│  └─ thumbnail
+     └─ LondonImage.jpg                # Thumbnail image for README
 ```
+
 
 ## Features
 
-- User-friendly interface for inputting preferences and requirements
-- Interactive map visualization of recommended areas
-- Detailed information about each recommended area, including housing prices, crime rates, and nearby amenities
-- Customizable weighting of different factors for personalized recommendations
+- **User-friendly Interface:** Simple inputs for users to specify preferences (e.g., housing prices, crime rates).
+- **Borough Clustering:** London boroughs are grouped based on socio-economic similarities.
+- **Interactive Map:** View boroughs and their cluster assignments on a choropleth map.
+- **Customizable Recommendations:** Users can adjust the importance of factors such as property prices or crime rates to receive personalized recommendations.
 
 ## How to Use
 
-1. Clone the repository
-2. Install the required packages: `pip install -r requirements.txt`
-3. Run the Streamlit app: `streamlit run app.py`
-4. Input your preferences and requirements in the sidebar
-5. Explore the recommended areas on the interactive map and in the detailed results section
+1. Input your preferences for various socio-economic factors (e.g., budget, safety, schools).
+2. The recommender system clusters and ranks boroughs that best align with your preferences.
+3. Explore borough recommendations on the interactive map and view detailed information about each recommended area.
 
-## Contributing
+### Example Usage
 
-Contributions to improve the London Area Recommender System are welcome. Please feel free to submit a Pull Request.
+Once the app is running, you can:
+
+- Adjust the sliders on the sidebar to input your preferences.
+- View the recommended boroughs highlighted on the map.
+- Explore each recommended borough based on its socio-economic factors.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+vbnet
+Copy code
+
+This is the complete markdown file, which you can directly integrate into your project's root directo
