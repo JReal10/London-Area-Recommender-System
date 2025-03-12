@@ -17,6 +17,13 @@
 
 **Documentation:** [Process of building it](https://github.com/JReal10/London-Area-Recommender-System/blob/main/area_recommender.ipynb)
 
+## Demo Preview
+
+<video width="100%" height="auto" controls>
+  <source src="video/demo.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 ## Project Overview
 
 The London Borough Recommender is a data-driven system that helps users discover suitable areas to live in London based on their personal preferences. It analyzes socio-economic factors across boroughs, such as housing prices, crime rates, unemployment rates, education, and environmental factors, to provide tailored recommendations.
@@ -150,8 +157,3 @@ Once the app is running, you can:
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
-
-vbnet
-Copy code
-
-This is the complete markdown file, which you can directly integrate into your project's root directo
