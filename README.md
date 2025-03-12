@@ -20,7 +20,7 @@
 ## Demo Preview
 
 <video width="100%" height="auto" controls>
-  <source src="video/demo.mp4" type="video/mp4">
+  <source src="demo.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
