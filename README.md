@@ -19,12 +19,7 @@
 
 ## Demo Preview
 
-[![Watch the Video](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://youtu.be/FR_qLssD1sY)
-
-<video width="600" controls autoplay loop muted>
-  <source src="https://github.com/username/repository/raw/main/path-to-your-video.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+[▶️ Watch Demo on YouTube](https://youtu.be/FR_qLssD1sY)
 
 ## Project Overview
 
